@@ -11,6 +11,7 @@ public class PredictHeight {
 		char childGender;
 		double motherHeight, fatherHeight;
 		while(loop){
+			//no bounds checking #yolo
 			System.out.println("Please enter the mother's height (inches): ");
 			motherHeight = keyboard.nextDouble();
 			System.out.println("Please enter the father's height (inches): ");
