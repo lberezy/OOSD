@@ -25,6 +25,8 @@ public class TestStudent {
 		System.out.println("Average marks: " + (student1.getAverageMark() + student2.getAverageMark())/2);
 		System.out.println("Number of students: " + student1.getStudentCount());
 		System.out.println(student1.toString());
+		System.out.println(student1.equals(student1));
+		System.out.println(student1.equals(student2));
 	}
 
 }
