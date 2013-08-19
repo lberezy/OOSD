@@ -13,6 +13,10 @@ public class Student {
 		this.SubjectCount = SubjCount;
 		StudentCount += 1;
 	}
+
+	public void finalize(){
+		this.StudentCount -= 1;
+	}
 	
 	public int getStudentCount(){
 		return this.StudentCount;
@@ -55,5 +59,18 @@ public class Student {
 		return "Name: " + this.Name +
 				"\nID: " + this.ID + 
 				"\nTaking " + SubjectCount + " subjects like a BAWS.";
+	}
+	
+	public boolean equals(Object obj){
+		if(obj == this){
+			return true;
+		} else if(obj == null){
+			return false;
+		} else if(obj.getClass() == this.getClass()){
+			Student student = (Student)obj;
+			if( (student.Name.equals(this.Name)) && (student.ID == this.ID) && (student.Subjects.equals(this.Subjects))){
+				return true;
+			}
+		} return false;
 	}
 }
