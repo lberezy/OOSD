@@ -1,24 +1,31 @@
 
-public class Organism {
+public abstract class Organism {
 	private char sprite;
-	private int x, y;
+	private Point location;
 	
-	public Organism (int x, int y, char sprite) {
-		this.x = x;
-		this.y = y;
+	public Organism (Point point, char sprite) {
+		this.location = point;
 		this.sprite = sprite;
 	}
 	
-	public void update(Map canvas) {
-		move();
-		breed();
+	public void update(Map grid) {
+		move(grid);
+		breed(grid);
 	}
 	
-	public void move() {
+	public void move(Map grid) {
+		Point found = new Point(grid.findFree(location));
+		if (found != null) {
+			grid.swap(location, found);
+		}
+	}
+	
+	public void breed(Map grid) {
 		
 	}
 	
-	public void breed() {
-		
+	public char getSprite() {
+		return this.sprite;
 	}
+	
 }
