@@ -100,8 +100,9 @@ public class Game extends BasicGame
     {
         AppGameContainer app = new AppGameContainer(new Game());
         // setShowFPS(true), to show frames-per-second.
-        app.setShowFPS(false);
-        // app.setVSync(true);
+        app.setShowFPS(true);
+        app.setVSync(true);
+        app.setSmoothDeltas(true);
         app.setDisplayMode(screenwidth, screenheight, false);
         app.start();
     }
