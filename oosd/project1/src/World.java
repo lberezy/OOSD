@@ -5,20 +5,25 @@
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.tiled.TiledMap;
 
 /** Represents the entire game world.
  * (Designed to be instantiated just once for the whole game).
  */
 public class World
 {
+	private TiledMap worldMap;
 	private Player player;
+	private Camera worldCamera;
     /** Create a new World object. */
     public World()
     throws SlickException
     {
         // TODO: Fill in
     	Image playerSprite = new Image(Game.ASSETS_PATH + "/units/player.png");
-    	this.player = new Player(1296, 13716, playerSprite); // player starting location
+    	this.player = new Player(0, 0, playerSprite); // player starting location
+    	this.worldMap = new TiledMap(Game.ASSETS_PATH + "/map.tmx", Game.ASSETS_PATH);
+    	this.worldCamera = new Camera(1296, 13488, 0.4, 0);	//Default starting location, vSpeed = 0.4 pixels/ms
     }
 
     /** Update the game state for a frame.
@@ -29,7 +34,8 @@ public class World
     public void update(double dir_x, double dir_y, int delta)
     throws SlickException
     {
-        // TODO: Fill in
+        worldCamera.update(delta);
+        player.update(dir_x, dir_y, delta);
     }
 
     /** Render the entire screen, so it reflects the current game state.
@@ -39,5 +45,11 @@ public class World
     throws SlickException
     {
         player.draw();
+        worldMap.render(-1, -1,	//On-screen location (top left)
+        		(int)worldCamera.x/worldMap.getTileWidth(), //Place in map to render (in tiles)
+        		(int)worldCamera.y/worldMap.getTileHeight(),
+        		Game.screenwidth/worldMap.getTileWidth() + 1, //Size of render (in tiles)
+        		Game.screenheight/worldMap.getTileHeight() + 1
+        		);
     }
 }
