@@ -67,14 +67,22 @@ public class Game extends BasicGame
         // Update the player's movement direction based on keyboard presses.
         double dir_x = 0;
         double dir_y = 0;
-        if (input.isKeyDown(Input.KEY_DOWN))
-            dir_y += 1;
-        if (input.isKeyDown(Input.KEY_UP))
-            dir_y -= 1;
-        if (input.isKeyDown(Input.KEY_LEFT))
-            dir_x -= 1;
-        if (input.isKeyDown(Input.KEY_RIGHT))
-            dir_x += 1;
+        // supports analog control sticks!
+        if(input.getControllerCount() >= 1) {
+	    	dir_x = input.getAxisValue(0, 0);
+	    	dir_y = input.getAxisValue(0, 1);
+    	}
+    	if (dir_x == 0 && dir_y == 0) {	// fall back to keyboard if no controller input
+	        if (input.isKeyDown(Input.KEY_DOWN) || input.isControllerDown(0))
+	            dir_y += 1;
+	        if (input.isKeyDown(Input.KEY_UP) || input.isControllerUp(0))
+	            dir_y -= 1;
+	        if (input.isKeyDown(Input.KEY_LEFT))
+	            dir_x -= 1;
+	        if (input.isKeyDown(Input.KEY_RIGHT) )
+	
+	            dir_x += 1;
+    	}
 
         // Let World.update decide what to do with this data.
         world.update(dir_x, dir_y, delta);
