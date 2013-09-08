@@ -2,12 +2,15 @@
 public class Camera {
 	public double x, y; //Camera current top-left position
 	private double vSpeed; //Camera vertical speed (pixels/ms)
+	private int width, height;
 	
-	public Camera(double x, double y, double vSpeed) {
+	public Camera(double x, double y, int w, int h, double vSpeed) {
 		//Instantiate the camera given top-left coordinates
 		this.x = x;
 		this.y = y;
-		this.vSpeed = vSpeed;
+		this.width = w;
+		this.height = h;
+		this.vSpeed = vSpeed; // default move speed
 
 	}
 	
@@ -37,5 +40,13 @@ public class Camera {
 	
 	public void setVSpeed(double vSpeed) {
 		this.vSpeed = vSpeed;
+	}
+	
+	public int getWidth() {
+		return this.width;
+	}
+	
+	public int getHeight() {
+		return this.height;
 	}
 }

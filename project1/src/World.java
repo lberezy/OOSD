@@ -28,7 +28,7 @@ public class World
     	Image playerSprite = new Image(Game.ASSETS_PATH + "/units/player.png");
     	this.player = new Player(1296, 13716, 0.25, 0.4, playerSprite, this); // player starting location
     	this.worldMap = new TiledMap(Game.ASSETS_PATH + "/map.tmx", Game.ASSETS_PATH);
-    	this.worldCamera = new Camera(1296, 13488, 0.25);	//Default starting location, vSpeed = 0.4 pixels/ms
+    	this.worldCamera = new Camera(1296, 13488, Game.screenwidth, Game.screenheight, 0.25);	//Default starting location, vSpeed = 0.4 pixels/ms
     	this.mapWidth = worldMap.getWidth();
     	this.mapHeight = worldMap.getHeight();
     	this.tileSize = worldMap.getTileWidth();
@@ -46,6 +46,9 @@ public class World
     	}
     }
 
+    public Camera getCamera() {
+    	return this.worldCamera;
+    }
     /** Update the game state for a frame.
      * @param dir_x The player's movement in the x axis (-1, 0 or 1).
      * @param dir_y The player's movement in the y axis (-1, 0 or 1).
@@ -57,6 +60,7 @@ public class World
         worldCamera.update(delta, player.getMidPoint());
         player.update(dir_x, dir_y, delta);
     }
+    
 
     /** Render the entire screen, so it reflects the current game state.
      * @param g The Slick graphics object, used for drawing.
