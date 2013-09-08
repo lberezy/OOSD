@@ -15,15 +15,35 @@ public class World
 	private TiledMap worldMap;
 	private Player player;
 	private Camera worldCamera;
+	// okay as will refer to most recent instance of the world
+	public static int mapWidth;
+	public static int mapHeight;
+	public static int tileSize;
     /** Create a new World object. */
     public World()
+    
     throws SlickException
     {
         // TODO: Fill in
     	Image playerSprite = new Image(Game.ASSETS_PATH + "/units/player.png");
-    	this.player = new Player(0, 0, playerSprite); // player starting location
+    	this.player = new Player(1296, 13716, 0.25, 0.4, playerSprite, this); // player starting location
     	this.worldMap = new TiledMap(Game.ASSETS_PATH + "/map.tmx", Game.ASSETS_PATH);
-    	this.worldCamera = new Camera(1296, 13488, 0.4, 0);	//Default starting location, vSpeed = 0.4 pixels/ms
+    	this.worldCamera = new Camera(1296, 13488, 0.25);	//Default starting location, vSpeed = 0.4 pixels/ms
+    	this.mapWidth = worldMap.getWidth();
+    	this.mapHeight = worldMap.getHeight();
+    	this.tileSize = worldMap.getTileWidth();
+    }
+    
+    public Boolean blockAtPoint(Point2D point) {
+    	int x = (int) point.x;
+    	int y = (int) point.y;
+    	
+    	int tileID = worldMap.getTileId(x, y, 0);	// get tileID at point, layer 0 of tilemap
+    	if (worldMap.getTileProperty(tileID, "block", "0").equals("1")) {	// check tile type, "1" = blocking
+    		return true;
+    	} else {
+    		return false;
+    	}
     }
 
     /** Update the game state for a frame.
@@ -34,7 +54,7 @@ public class World
     public void update(double dir_x, double dir_y, int delta)
     throws SlickException
     {
-        worldCamera.update(delta);
+        worldCamera.update(delta, player.getMidPoint());
         player.update(dir_x, dir_y, delta);
     }
 
@@ -44,12 +64,27 @@ public class World
     public void render(Graphics g)
     throws SlickException
     {
+
+        g.translate(-(float)worldCamera.x, -(float)worldCamera.y);
+    	drawMapRegion((int)worldCamera.x, (int)worldCamera.y, World.mapWidth, World.mapHeight);
         player.draw();
-        worldMap.render(-1, -1,	//On-screen location (top left)
-        		(int)worldCamera.x/worldMap.getTileWidth(), //Place in map to render (in tiles)
-        		(int)worldCamera.y/worldMap.getTileHeight(),
-        		Game.screenwidth/worldMap.getTileWidth() + 1, //Size of render (in tiles)
-        		Game.screenheight/worldMap.getTileHeight() + 1
-        		);
+        g.resetTransform();
+    }
+    
+    public void drawMapRegion(int x, int y, int width, int height) {
+    	/** Attempts to render only the tiles being seen by the camera */
+    	int tileWidth = worldMap.getTileWidth();
+    	int tileHeight = worldMap.getTileHeight();
+    	// following variables in terms of tiles
+    	int offsetX = x % tileWidth;
+    	int offsetY = y % tileHeight;
+    	int indexX = x / tileWidth;
+    	int indexY = y / tileHeight;
+
+    	
+    	worldMap.render(x - offsetX,y - offsetY, // location in graphics context to render
+    			indexX, indexY, // top left block of render window
+    			mapWidth, // width of section to render (in tiles)
+    			mapHeight);
     }
 }
