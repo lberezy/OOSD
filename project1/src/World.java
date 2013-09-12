@@ -49,10 +49,10 @@ public class World
     	//System.out.println("blockpoint: " + x + " " + y);
     	x -= 1;
     	y -= 1;
-    	if (worldMap.isValidPoint(x, y)) {
-//        	int tileID = worldMap.getTileId(x/worldMap.getWidth(), y/worldMap.getHeight(), 0);	// get tileID at point, layer 0 of tilemap
-        	return worldMap.checkBlock(x/tileSize, y/tileSize);
-        	//return (worldMap.getTileProperty(tileID, "block", "0").equals("1"));
+    	if (true) {
+        	int tileID = worldMap.getTileId(x/tileSize, y/tileSize, 0);	// get tileID at point, layer 0 of tilemap
+        	//return worldMap.checkBlock(x/tileSize, y/tileSize);
+        	return (worldMap.getTileProperty(tileID, "block", "0").equals("1"));
         	//return true;
     	} else {
     		return false;
@@ -115,6 +115,12 @@ public class World
     	// camera location is now (0, 0) for drawing
         drawMapRegion((int)worldCamera.x, (int)worldCamera.y, this.mapWidth, this.mapHeight);
         player.draw();
+        // for debugging
+        g.drawOval((float)player.x, (float)player.y - 32, 1f, 1f, 6);
+        g.drawOval((float)player.x, (float)player.y + 32, 1f, 1f, 6);
+        g.drawOval((float)player.x - 32, (float)player.y, 1f, 1f, 6);
+        g.drawOval((float)player.x + 32, (float)player.y, 1f, 1f, 6);
+        
         g.resetTransform(); // just in case anything else needs to be done elsewhere, reduce side-effects
     }
     

@@ -4,6 +4,7 @@ public class Player extends GameObject {
 	private Image sprite;
 	private double baseSpeed;
 	private double moveSpeed;
+	private Boolean inCollision;
 	
 	public Player(double x, double y, double baseSpeed, double moveSpeed, Image sprite, World world) {
 		super(x, y, world);
@@ -84,6 +85,23 @@ public class Player extends GameObject {
 		}
 		return false;
 	}
+	
+	private Boolean isCollisionUp() {
+		return ownerWorld.blockAtPoint((int)this.x, (int)this.y - sprite.getHeight()/2 - 1);
+	}
+	
+	private Boolean isCollisionDown() {
+		return ownerWorld.blockAtPoint((int)this.x, (int)this.y + sprite.getHeight()/2 + 1);
+	}
+	
+	private Boolean isCollisionLeft() {
+		return ownerWorld.blockAtPoint((int)this.x - sprite.getWidth()/2 - 1, (int)this.y);
+	}
+	
+	private Boolean isCollisionRight() {
+		return ownerWorld.blockAtPoint((int)this.x + sprite.getWidth()/2 + 1, (int)this.y);
+	}
+	
 	private Boolean checkHCollisions() {
 		/** Check for collision at sides of sprite
 		 * 
@@ -103,16 +121,29 @@ public class Player extends GameObject {
 	public void update(double dir_x, double dir_y, int delta) {
 		/** updates the players position and future movement (blocking) */
 		// update player position
-		if (checkVCollisions() == false) {
-			this.y += (-baseSpeed * delta) + (moveSpeed * dir_y * delta);
+//		if (checkVCollisions() == false) {
+//			this.y += (-baseSpeed * delta) + (moveSpeed * dir_y * delta);
+//
+//		} else {
+//			this.y -= dir_y;
+//		}
+//		if (checkHCollisions() == false) {
+//			this.x += moveSpeed * dir_x * delta;
+//
+//		}
+		double deltaX = 0, deltaY = 0;
+		deltaY = (-baseSpeed * delta) + (moveSpeed * dir_y * delta);
+		deltaX = moveSpeed * dir_x * delta;
 
-		} else {
-			this.y -= dir_y;
+		
+		if (!(isCollisionRight() && deltaX > 0 || isCollisionLeft() && deltaX < 0)) {
+			this.x += deltaX;
 		}
-		if (checkHCollisions() == false) {
-			this.x += moveSpeed * dir_x * delta;
+		
+		if (!(isCollisionUp() && deltaY < 0 || isCollisionDown() && deltaY > 0)) {
+			this.y += deltaY;
+		}
 
-		}
 		// handle bounding conditions
 		mapBounds();
 		cameraBounds();
