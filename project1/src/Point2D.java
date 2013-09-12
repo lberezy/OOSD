@@ -1,5 +1,6 @@
 
 public class Point2D {
+	/** class represents a 2D point in game space, used for passing around data */
 	public double x, y;
 	
 	public Point2D(double x, double y) {

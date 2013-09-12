@@ -1,36 +1,32 @@
 import org.newdawn.slick.Image;
 
-public class Player {
+public class Player extends GameObject {
 	private Image sprite;
-	private double x, y;
-	private World ownerWorld;
 	private double baseSpeed;
 	private double moveSpeed;
 	
 	public Player(double x, double y, double baseSpeed, double moveSpeed, Image sprite, World world) {
+		super(x, y, world);
 		this.sprite = sprite;
-		this.x = x;
-		this.y = y;
 		this.baseSpeed = baseSpeed;
 		this.moveSpeed = moveSpeed;
-		this.ownerWorld = world; // reference to world that created the player
+
 	}
 	
 	public void mapBounds() {
 		// handles map boundaries, treats sprite bounds as rectangle
 		// prevent leaving top of map
 		if (this.y - sprite.getHeight()/2 <= 0) this.y = sprite.getHeight()/2;	// prevent leaving top of map
-		
 		// prevent leaving bottom of map without collision
-		if (this.y + sprite.getHeight()/2 >= (ownerWorld.mapHeight * ownerWorld.tileSize)) {
-			this.y = (ownerWorld.mapHeight * ownerWorld.tileSize) - sprite.getHeight()/2;
+		if (this.y + sprite.getHeight()/2 >= (ownerWorld.mapHeight() * ownerWorld.tileSize())) {
+			this.y = (ownerWorld.mapHeight() * ownerWorld.tileSize()) - sprite.getHeight()/2;
 		}
 		
 		// prevent leaving sides of map
 		if (this.x - sprite.getWidth()/2 <= 0) this.x = sprite.getWidth()/2;	// left side
 
-		if (this.x + sprite.getWidth()/2 >= (ownerWorld.mapWidth * ownerWorld.tileSize)){	// right side
-			this.x = (ownerWorld.mapWidth * ownerWorld.tileSize) - sprite.getWidth()/2;
+		if (this.x + sprite.getWidth()/2 >= (ownerWorld.mapWidth() * ownerWorld.tileSize())){	// right side
+			this.x = (ownerWorld.mapWidth() * ownerWorld.tileSize()) - sprite.getWidth()/2;
 		} 
 	}
 	
@@ -56,11 +52,47 @@ public class Player {
 		} 
 	}
 	
+	
+	
 	private Boolean isCollision() {
-		// checks the coordinates just ahead of the object for map tiles that block movement
+		/** Checks 9 coordinates around the corners and sides of a rectangle
+		 * around the sprite. Returns a tuple of values, horizontal and vertical. Coerces the Point2D
+		 * class to do so (represents x, y as horizontal, vertical).
+		 * 
+		 */
+		int i, j;
+
+		for (i = -1; i <= 1; i += 2) {
+			for (j = -1; j <= 1; j += 2) {
+				if (ownerWorld.blockAtPoint(new Point2D(this.x + i * sprite.getWidth()/2,
+														this.y + j * sprite.getHeight()/2))) {
+					return true;
+				}
+					
+			}
+		}
 		
 		return ownerWorld.blockAtPoint(new Point2D(this.x, this.y - 1));
 			
+	}
+
+	
+	private Boolean checkVCollisions() {
+		if (ownerWorld.blockAtPoint((int)this.x, (int)this.y + sprite.getHeight()/2) ||
+			ownerWorld.blockAtPoint((int)this.x, (int)this.y - sprite.getHeight()/2)) {
+			return true;
+		}
+		return false;
+	}
+	private Boolean checkHCollisions() {
+		/** Check for collision at sides of sprite
+		 * 
+		 */
+		if (ownerWorld.blockAtPoint((int)this.x + sprite.getWidth()/2, (int)this.y) ||
+			ownerWorld.blockAtPoint((int)this.x - sprite.getWidth()/2, (int)this.y)) {
+			return true;
+		}
+		return false;
 	}
 	
 
@@ -69,10 +101,22 @@ public class Player {
 	}
 	
 	public void update(double dir_x, double dir_y, int delta) {
-		this.x += moveSpeed * dir_x * delta;
-		this.y += (-baseSpeed * delta) + (moveSpeed * dir_y * delta);
+		/** updates the players position and future movement (blocking) */
+		// update player position
+		if (checkVCollisions() == false) {
+			this.y += (-baseSpeed * delta) + (moveSpeed * dir_y * delta);
+
+		} else {
+			this.y -= dir_y;
+		}
+		if (checkHCollisions() == false) {
+			this.x += moveSpeed * dir_x * delta;
+
+		}
+		// handle bounding conditions
 		mapBounds();
 		cameraBounds();
+		
 	}
 	
 	public Point2D getMidPoint() {
