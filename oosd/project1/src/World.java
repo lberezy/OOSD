@@ -17,48 +17,58 @@ public class World
 	private int mapWidth;
 	private int mapHeight;
 	private int tileSize;
-    /** Create a new World object. */
-    public World()
-    
-    throws SlickException
-    {
-        // TODO: Convert x, y parameters to Point2D parameters
-    	Image playerSprite = new Image(Game.ASSETS_PATH + "/units/player.png");
+	private int tileWidth;
+	private int tileHeight;
+	
+	
 
+    public World() throws SlickException {
+    	/** Constructs the game world
+    	 * 
+    	 */
+    	
+        // TODO: Convert x, y parameters to Point2D parameters, extend (x,y) methods args with Point2D args
+    	
+    	// load map
     	this.worldMap = new Map(Game.ASSETS_PATH + "/map.tmx", Game.ASSETS_PATH);
     	
+    	// load player
+    	Image playerSprite = new Image(Game.ASSETS_PATH + "/units/player.png");
     	this.player = new Player(1296, 13716,	 // player starting location
     			0.25, 0.4,	// default speed, movement speed (pixels/ms)
     			playerSprite,	// sprite
     			this);	// callback reference to world
+    	
+    	// create camera
     	this.worldCamera = new Camera(1296, 13488,	// camera starting location
     								Game.screenwidth, Game.screenheight, // camera viewport size
     								0.25, // default vertical move speed (0.25 pixels/ms)
     								this);	// callback reference to world
     	
+    	// set misc variables
     	this.mapWidth = worldMap.getWidth();
     	this.mapHeight = worldMap.getHeight();
     	this.tileSize = worldMap.getTileWidth();
+    	this.tileWidth = worldMap.getTileWidth();
+    	this.tileHeight = worldMap.getTileHeight();
     }
     
 
     
     public Boolean blockAtPoint(int x, int y) {
-    	/** queries the tilemap if a game-world point is in a region that should block movement */
-    	// if the input location is invalid, return false (player leaving map, etc)
-    	//System.out.println("blockpoint: " + x + " " + y);
-    	x -= 1;
-    	y -= 1;
-    	if (true) {
-        	int tileID = worldMap.getTileId(x/tileSize, y/tileSize, 0);	// get tileID at point, layer 0 of tilemap
-        	//return worldMap.checkBlock(x/tileSize, y/tileSize);
-        	return (worldMap.getTileProperty(tileID, "block", "0").equals("1"));
-        	//return true;
-    	} else {
-    		return false;
-    	}
+    	/** queries the map if a game-world point is in a region that should block movement 
+    	 * returns false if the point is invalid anyway
+    	 */
+    	
+    	//TODO: use if (worldMap.isValidPoint(x, y)) test, but method is not working correctly at this stage
+    	
+		return worldMap.checkBlock(x/tileSize, y/tileSize);
+		
+		// following method also works, but is less efficient
+		
+    	//int tileID = worldMap.getTileId(x/tileWidth, y/tileHeight, 0);	// get tileID at point, layer 0 of map
+		//return (worldMap.getTileProperty(tileID, "block", "0").equals("1"));
     }
-    
     
     public Boolean blockAtPoint(Point2D point) {
     	/** extends support for Point2D points to blockAtPoint.
@@ -68,8 +78,6 @@ public class World
     	int y = (int)point.y;
     	return blockAtPoint(x, y);
     }
-    
-
 
     public Camera getCamera() {
     	return this.worldCamera;
@@ -110,30 +118,31 @@ public class World
     public void render(Graphics g)
     throws SlickException
     {
-   
+
+
         g.translate(-(float)worldCamera.x, -(float)worldCamera.y); // move the graphics coordinates relative to camera
     	// camera location is now (0, 0) for drawing
         drawMapRegion((int)worldCamera.x, (int)worldCamera.y, this.mapWidth, this.mapHeight);
         player.draw();
         // for debugging
-        g.drawOval((float)player.x, (float)player.y - 32, 1f, 1f, 6);
-        g.drawOval((float)player.x, (float)player.y + 32, 1f, 1f, 6);
-        g.drawOval((float)player.x - 32, (float)player.y, 1f, 1f, 6);
-        g.drawOval((float)player.x + 32, (float)player.y, 1f, 1f, 6);
-        
-        g.resetTransform(); // just in case anything else needs to be done elsewhere, reduce side-effects
+        if (Game.debug) {
+        	g.drawString("X tile: " + (int)player.x/tileSize, (float)player.x, (float)player.y);
+        	g.drawString("Y tile: " + (int)player.y/tileSize, (float)player.x, (float)player.y + 20);
+	        g.drawOval((float)player.x, (float)player.y - 32, 1f, 1f, 6);
+	        g.drawOval((float)player.x, (float)player.y + 32, 1f, 1f, 6);
+	        g.drawOval((float)player.x - 32, (float)player.y, 1f, 1f, 6);
+	        g.drawOval((float)player.x + 32, (float)player.y, 1f, 1f, 6);
+        }
+        g.resetTransform(); // leave graphics coordinates as they were found
     }
     
     public void drawMapRegion(int x, int y, int width, int height) {
     	/** Attempts to render only the tiles being seen by the camera */
-    	int tileWidth = this.worldMap.getTileWidth();
-    	int tileHeight = this.worldMap.getTileHeight();
-    	// following variables in terms of tiles
+    	// variables in terms of map tiles
     	int offsetX = x % tileWidth;
     	int offsetY = y % tileHeight;
     	int indexX = x / tileWidth;
     	int indexY = y / tileHeight;
-
     	
     	worldMap.render(x - offsetX,y - offsetY, // location in graphics context to render
     					indexX, indexY, // top left block of render window

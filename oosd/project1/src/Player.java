@@ -4,7 +4,7 @@ public class Player extends GameObject {
 	private Image sprite;
 	private double baseSpeed;
 	private double moveSpeed;
-	private Boolean inCollision;
+	private Boolean inCollision; // as yet unused
 	
 	public Player(double x, double y, double baseSpeed, double moveSpeed, Image sprite, World world) {
 		super(x, y, world);
@@ -36,12 +36,12 @@ public class Player extends GameObject {
 		Camera camera = ownerWorld.getCamera();
 		// handles camera window boundaries
 		
+		// top of camera
 		if (this.y - sprite.getHeight()/2 <= camera.y) this.y = camera.y + sprite.getHeight()/2;	// prevent leaving top of map
 		
 		// prevent leaving bottom of map without collision
-		// player is allowed to 3/4 of plane below the camera line for more fun
-		if (this.y - sprite.getHeight()/4 >= camera.y + camera.getHeight()) {
-			this.y = camera.y + camera.getHeight() + sprite.getHeight()/4;
+		if (this.y + sprite.getHeight()/2 >= camera.y + camera.getHeight() && isCollisionUp() == false) {
+			this.y = camera.y + camera.getHeight() - sprite.getHeight()/2;
 		}
 		
 		if (this.x - sprite.getWidth()/2 <= camera.x) {
@@ -54,12 +54,10 @@ public class Player extends GameObject {
 	}
 	
 	
-	
+	// as yet unused
 	private Boolean isCollision() {
 		/** Checks 9 coordinates around the corners and sides of a rectangle
-		 * around the sprite. Returns a tuple of values, horizontal and vertical. Coerces the Point2D
-		 * class to do so (represents x, y as horizontal, vertical).
-		 * 
+		 * around the sprite.
 		 */
 		int i, j;
 
@@ -68,23 +66,31 @@ public class Player extends GameObject {
 				if (ownerWorld.blockAtPoint(new Point2D(this.x + i * sprite.getWidth()/2,
 														this.y + j * sprite.getHeight()/2))) {
 					return true;
-				}
-					
+				}	
 			}
-		}
-		
-		return ownerWorld.blockAtPoint(new Point2D(this.x, this.y - 1));
-			
-	}
-
-	
-	private Boolean checkVCollisions() {
-		if (ownerWorld.blockAtPoint((int)this.x, (int)this.y + sprite.getHeight()/2) ||
-			ownerWorld.blockAtPoint((int)this.x, (int)this.y - sprite.getHeight()/2)) {
-			return true;
 		}
 		return false;
 	}
+
+	// unused
+	private Boolean checkVCollisions() {
+		/** Check for collision at top and bottom of sprite
+		 * 
+		 */
+		return (isCollisionUp() || isCollisionDown());
+	}
+	//unused
+	private Boolean checkHCollisions() {
+		/** Check for collision at sides of sprite
+		 * 
+		 */
+		return (isCollisionLeft() || isCollisionRight());
+	}
+	
+	
+	// the following collision detection methods check a + shape over the sprite
+	// it may be better to use a rectangle over the sprite so that the player can never
+	// clip through tiles, but this makes the movement around corners feel weird and slow
 	
 	private Boolean isCollisionUp() {
 		return ownerWorld.blockAtPoint((int)this.x, (int)this.y - sprite.getHeight()/2 - 1);
@@ -101,40 +107,26 @@ public class Player extends GameObject {
 	private Boolean isCollisionRight() {
 		return ownerWorld.blockAtPoint((int)this.x + sprite.getWidth()/2 + 1, (int)this.y);
 	}
-	
-	private Boolean checkHCollisions() {
-		/** Check for collision at sides of sprite
-		 * 
-		 */
-		if (ownerWorld.blockAtPoint((int)this.x + sprite.getWidth()/2, (int)this.y) ||
-			ownerWorld.blockAtPoint((int)this.x - sprite.getWidth()/2, (int)this.y)) {
-			return true;
-		}
-		return false;
-	}
+
 	
 
 	public void draw() {
 		sprite.drawCentered((float)x, (float)y);
 	}
 	
+//	public Boolean playerOffScreen() {
+//		/** Checks if player has been pushed off screen.
+//		 * 
+//		 */
+//		return false;
+//	}
+	
 	public void update(double dir_x, double dir_y, int delta) {
 		/** updates the players position and future movement (blocking) */
-		// update player position
-//		if (checkVCollisions() == false) {
-//			this.y += (-baseSpeed * delta) + (moveSpeed * dir_y * delta);
-//
-//		} else {
-//			this.y -= dir_y;
-//		}
-//		if (checkHCollisions() == false) {
-//			this.x += moveSpeed * dir_x * delta;
-//
-//		}
 		double deltaX = 0, deltaY = 0;
+		
 		deltaY = (-baseSpeed * delta) + (moveSpeed * dir_y * delta);
 		deltaX = moveSpeed * dir_x * delta;
-
 		
 		if (!(isCollisionRight() && deltaX > 0 || isCollisionLeft() && deltaX < 0)) {
 			this.x += deltaX;
@@ -147,7 +139,6 @@ public class Player extends GameObject {
 		// handle bounding conditions
 		mapBounds();
 		cameraBounds();
-		
 	}
 	
 	public Point2D getMidPoint() {

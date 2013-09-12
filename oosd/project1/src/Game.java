@@ -17,6 +17,8 @@ public class Game extends BasicGame
 {
     /** Location of the "assets" directory. */
     public static final String ASSETS_PATH = "assets";
+	public static final Boolean debug = true;
+
 
     /** The game state. */
     private World world;
