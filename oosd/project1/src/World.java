@@ -24,7 +24,9 @@ public class World
 
     public World() throws SlickException {
     	/** Constructs the game world
-    	 * 
+    	 * This game uses graphics from copyrighted and alternatively licensed works Chromium B.S.U
+    	 * and Battle for Wesnoth, licensed under the Artistic License and the GNU GPL v.2+ respectively.
+    	 * If this program were released, there would have to be a GPL license header here...
     	 */
     	
         // TODO: Convert x, y parameters to Point2D parameters, extend (x,y) methods args with Point2D args
