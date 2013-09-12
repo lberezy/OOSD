@@ -1,5 +1,6 @@
 /* SWEN20003 Object Oriented Software Development
  * Space Game Engine - Skeleton
+ * Author: Matt Giuca <mgiuca>
  * Derived Author: Lucas Berezy (588 236)
  * Based off supplied skeleton code. Said code reproduces works from copyrighted titles
  * Chromium B.S.U. and (Artistic License) and Battle for Wesnoth (GNU General Public License v.2+).
