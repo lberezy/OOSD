@@ -6,6 +6,13 @@
  * Chromium B.S.U. and (Artistic License) and Battle for Wesnoth (GNU General Public License v.2+).
  */
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.util.ArrayList;
+
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
@@ -17,21 +24,22 @@ public class World
 {
 	private Map worldMap;
 	private Player player;
+	private Panel panel;
 	private Camera worldCamera;
 	private int mapWidth;
 	private int mapHeight;
 	private int tileSize;
 	private int tileWidth;
 	private int tileHeight;
+	// Why doesn't this work?
+	//private ArrayList<? extends GameObject> enemies, missiles, items;
+	
+	private ArrayList<Missile> missiles = new ArrayList<Missile>();
 	
 	
 
     public World() throws SlickException {
-    	/** Constructs the game world
-    	 * This game uses graphics from copyrighted and alternatively licensed works Chromium B.S.U
-    	 * and Battle for Wesnoth, licensed under the Artistic License and the GNU GPL v.2+ respectively.
-    	 * If this program were released, there would have to be a GPL license header here...
-    	 */
+    	/* Constructs the game world */
     	
         // TODO: Convert x, y parameters to Point2D parameters, extend (x,y) methods args with Point2D args
     	
@@ -51,12 +59,16 @@ public class World
     								0.25, // default vertical move speed (0.25 pixels/ms)
     								this);	// callback reference to world
     	
+    	// create stat panel for player
+    	this.panel = new Panel();
     	// set misc variables
     	this.mapWidth = worldMap.getWidth();
     	this.mapHeight = worldMap.getHeight();
     	this.tileSize = worldMap.getTileWidth();
     	this.tileWidth = worldMap.getTileWidth();
     	this.tileHeight = worldMap.getTileHeight();
+    	
+    	//this.missiles = new ArrayList<Missile>();
     }
     
 
@@ -74,6 +86,38 @@ public class World
 		
     	//int tileID = worldMap.getTileId(x/tileWidth, y/tileHeight, 0);	// get tileID at point, layer 0 of map
 		//return (worldMap.getTileProperty(tileID, "block", "0").equals("1"));
+    }
+    
+    private void createUnits(String unitsFile) {
+    	BufferedReader reader = null;
+    	try {
+    		//because they couldn't afford to chuck in a simple csv parser in all the java.* bloat
+    		File file = new File(unitsFile);
+    		reader = new BufferedReader(new FileReader(file));
+    		
+    		String line;
+    		String[] tokens;
+    		while((line = reader.readLine()) != null ) {
+    			tokens = line.split("?,[ ]+"); // csv splitting
+    			
+    			//print the tokens
+    			for( String s : tokens) {
+    				System.out.println(s);
+        			//TODO: Insert case statement here for creating each object
+    			}
+    			
+    		}
+    		
+    	} catch (Exception e) {
+    		System.err.println("Error: " + e.getMessage());
+    	} finally {
+    		try {
+    			reader.close();
+    			
+    		} catch (IOException e) {
+    			System.err.println("Error: " + e.getMessage());
+    		}
+    	}
     }
     
     public Boolean blockAtPoint(Point2D point) {
@@ -140,6 +184,7 @@ public class World
 	        g.drawOval((float)player.x + 32, (float)player.y, 1f, 1f, 6);
         }
         g.resetTransform(); // leave graphics coordinates as they were found
+    	panel.render(g, 1,10,100);	// render panel on top always
     }
     
     public void drawMapRegion(int x, int y, int width, int height) {
@@ -155,4 +200,20 @@ public class World
     					mapWidth, // width of section to render (in tiles)
     					mapHeight);
     }
+
+
+
+	public void registerMissile(Missile missile) {
+		this.missiles.add(missile);	
+	}
+	
+	public void removeMissile(Missile missile) {
+		this.missiles.remove(missile);
+	}
+	
+	public void renderMissiles() {
+		for (Missile m : missiles) {
+			m.render();
+		}
+	}
 }
