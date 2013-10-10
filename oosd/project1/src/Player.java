@@ -1,14 +1,13 @@
 import org.newdawn.slick.Image;
 
 public class Player extends GameObject {
-	private Image sprite;
 	private double baseSpeed;
 	private double moveSpeed;
+	private double shield;
 	private Boolean inCollision; // as yet unused
 	
 	public Player(double x, double y, double baseSpeed, double moveSpeed, Image sprite, World world) {
-		super(x, y, world);
-		this.sprite = sprite;
+		super(x, y, sprite, world);
 		this.baseSpeed = baseSpeed;
 		this.moveSpeed = moveSpeed;
 
@@ -109,20 +108,18 @@ public class Player extends GameObject {
 	}
 
 	
-
 	public void draw() {
-		sprite.drawCentered((float)x, (float)y);
+		this.sprite.drawCentered((float)x, (float)y);
 	}
 	
-//	public Boolean playerOffScreen() {
-//		/** Checks if player has been pushed off screen.
-//		 * 
-//		 */
-//		return false;
-//	}
 	
+	/** Updates the player's position and future movement. Handles map blocking.
+	 * @param dir_x -1 to move left, 1 to move right
+	 * @param dir_y -1 to move up, 1 to move down
+	 * @param delta milliseconds since last frame
+	 * */
 	public void update(double dir_x, double dir_y, int delta) {
-		/** updates the players position and future movement (blocking) */
+
 		double deltaX = 0, deltaY = 0;
 		
 		deltaY = (-baseSpeed * delta) + (moveSpeed * dir_y * delta);
@@ -146,4 +143,17 @@ public class Player extends GameObject {
 							this.y + this.sprite.getHeight()/2);
 						
 	}
+
+	@Override
+	public void update(int delta) {
+		// Required by interface, but can't override without breaking all other objects
+		// Should be fine in this one case.
+		
+	}
+
+
+
+
+
+
 }
