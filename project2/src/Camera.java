@@ -1,11 +1,15 @@
 
-public class Camera extends GameObject{
+public class Camera{
 	private double vSpeed; //Camera vertical speed (pixels/ms)
 	private int width, height;
+	private World ownerWorld;
+	public double x, y;	// deliberately public
 	
 	public Camera(double x, double y, int w, int h, double vSpeed, World ownerWorld) {
 		//Instantiate the camera given top-left coordinates
-		super(x, y, ownerWorld);
+		this.x = x;
+		this.y = y;
+		this.ownerWorld = ownerWorld;
 		this.width = w;
 		this.height = h;
 		this.vSpeed = vSpeed; // default move speed

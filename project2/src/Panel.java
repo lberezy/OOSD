@@ -17,10 +17,6 @@ public class Panel
     /** Height of the status panel in pixels. */
     public static final int PANEL_HEIGHT = 70;
 
-    /** Maximum allowed value for the player's shield.
-     * Used for rendering the shield bar. */
-    private static final int MAX_SHIELD = 220;
-
     /** Image for the panel background. */
     private Image panel;
     /** Image for the firepower icon. */
@@ -58,7 +54,6 @@ public class Panel
         int shield_bar_width;       // Size of green (Shield) rectangle
         int fp_x, fp_y;             // Coordinates to draw firepower
 
-        float full_shield_percent;  // Player's Full-Shield, % of MAX_SHIELD
         float shield_percent;       // Player's Shield, % of MAX_SHIELD
 
         panel_top = Game.screenheight - PANEL_HEIGHT;
@@ -77,10 +72,11 @@ public class Panel
         bar_y = panel_top + 24;
         bar_width = 410;
         bar_height = 30;
-        full_shield_percent = (float) full_shield / MAX_SHIELD;
-        shield_percent = (float) shield / MAX_SHIELD;
-        full_shield_bar_width = (int) (bar_width * full_shield_percent);
+        
+        shield_percent = (float) shield / full_shield;
+        full_shield_bar_width = (int) (bar_width);
         shield_bar_width = (int) (bar_width * shield_percent);
+        
         text_x = bar_x +
             (full_shield_bar_width - g.getFont().getWidth(text)) / 2;
         g.setColor(BAR_BG);
