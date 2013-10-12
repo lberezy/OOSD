@@ -1,9 +1,12 @@
+import org.newdawn.slick.geom.Rectangle;
+
 
 public class Camera{
 	private double vSpeed; //Camera vertical speed (pixels/ms)
 	private int width, height;
 	private World ownerWorld;
 	public double x, y;	// deliberately public
+	private Rectangle boundingBox;
 	
 	public Camera(double x, double y, int w, int h, double vSpeed, World ownerWorld) {
 		//Instantiate the camera given top-left coordinates
@@ -13,6 +16,7 @@ public class Camera{
 		this.width = w;
 		this.height = h;
 		this.vSpeed = vSpeed; // default move speed
+		this.boundingBox = new Rectangle((float)x + width/2,(float)y + height/2, (float)width, (float)height);
 
 	}
 	
@@ -23,6 +27,16 @@ public class Camera{
 		// this.y = playerMid.y - Game.screenheight/2;	// follow player vertically
 		this.y -= vSpeed * delta;
 		mapBounds();
+		updateBoundingBox();
+	}
+	
+	private void updateBoundingBox() {
+		this.boundingBox.setLocation((float)this.x, (float)this.y);
+	}
+	
+	public boolean canSee(GameObject obj) {
+		return this.boundingBox.intersects(obj.getBoundingBox());
+
 	}
 	
 	public void mapBounds() {
