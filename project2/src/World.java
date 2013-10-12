@@ -33,6 +33,7 @@ public class World {
 	private ArrayList<Missile> missiles = new ArrayList<Missile>();
 	private ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 	private ArrayList<GameObject> cleanup = new ArrayList<GameObject>();
+	private ArrayList<GameObject> onScreen = new ArrayList<GameObject>();
 
 	// private ArrayList<? extends GameObject> missiles, enemies, items,
 	// visible;
@@ -70,7 +71,7 @@ public class World {
 		this.tileHeight = worldMap.getTileHeight();
 	}
 
-	public Boolean blockAtPoint(int x, int y) {
+	public Boolean blockAtPoint(double x, double y) {
 		/**
 		 * queries the map if a game-world point is in a region that should
 		 * block movement returns false if the point is invalid anyway
@@ -78,13 +79,13 @@ public class World {
 
 		// TODO: use if (worldMap.isValidPoint(x, y)) test, but method is not
 		// working correctly at this stage
-		int tileX = x / tileSize;
-		int tileY = y / tileSize;
+		int tileX = (int) (x / tileSize);
+		int tileY = (int) (y / tileSize);
 
 		if (tileX < 0 || tileX > worldMap.getWidth() || tileY < 0 || tileY > worldMap.getHeight()) {
 			return true;
 		} else {
-			return worldMap.checkBlock(x / tileSize, y / tileSize);
+			return worldMap.checkBlock(x, y);
 
 		}
 
@@ -131,6 +132,7 @@ public class World {
 		switch (unit) {
 		case Player:
 			player = new Player(x, y, this);
+			break;
 		case Asteroid:
 			enemies.add(new Asteroid(x, y, this));
 			break;
@@ -147,16 +149,6 @@ public class World {
 			// TODO: throw unhandled unit exception here
 			break;
 		}
-	}
-
-	public Boolean blockAtPoint(Point2D point) {
-		/**
-		 * extends support for Point2D points to blockAtPoint. Polymorphism is
-		 * cool.
-		 */
-		int x = (int) point.x;
-		int y = (int) point.y;
-		return blockAtPoint(x, y);
 	}
 
 	public Camera getCamera() {
@@ -230,10 +222,11 @@ public class World {
 			g.draw(player.getBoundingBox());
 			g.resetTransform();
 			g.drawString("Missile collection: " + missiles.size(), 0, 20);
+			g.drawString("onScreen: " + onScreen.size(), 0, 40);
 
 		}
 		g.resetTransform(); // leave graphics coordinates as they were found
-
+		onScreen.clear();
 		panel.render(g, player.getShield(), player.getFullShield(), player.getFirepower()); // render
 																							// panel
 																							// on
@@ -284,6 +277,7 @@ public class World {
 		for (Enemy e : enemies) {
 			if (worldCamera.canSee(e)) {
 				e.update(delta);
+				onScreen.add(e);
 			}
 		}
 	}
@@ -292,6 +286,7 @@ public class World {
 		for (Enemy e : enemies) {
 			if (worldCamera.canSee(e)) {
 				e.render();
+
 			}
 		}
 	}

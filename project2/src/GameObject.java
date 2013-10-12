@@ -59,23 +59,25 @@ public abstract class GameObject implements Drawable {
 		return this.objID;
 	}
 
-	public boolean isSeen() {
-		/**
-		 * Checks if object is visible to its owner world's camera.
-		 */
-		Camera myCamera = this.ownerWorld.getCamera();
-		double camHeight = myCamera.getHeight();
-		double camWidth = myCamera.getWidth();
-
-		if ((this.x - (this.sprite.getWidth() / 2) < myCamera.x)
-				|| (this.x + (this.sprite.getWidth() / 2) > (myCamera.x + myCamera.getWidth())
-						|| (this.y - (this.sprite.getHeight() / 2) < myCamera.y) || (this.y
-						+ (this.sprite.getHeight() / 2) > (myCamera.y + myCamera.getHeight())))) {
-			return false;
-		} else {
-			return true;
-		}
-	}
+	// public boolean isSeen() {
+	// /**
+	// * Checks if object is visible to its owner world's camera.
+	// */
+	// Camera myCamera = this.ownerWorld.getCamera();
+	// double camHeight = myCamera.getHeight();
+	// double camWidth = myCamera.getWidth();
+	//
+	// if ((this.x - (this.sprite.getWidth() / 2) < myCamera.x)
+	// || (this.x + (this.sprite.getWidth() / 2) > (myCamera.x +
+	// myCamera.getWidth())
+	// || (this.y - (this.sprite.getHeight() / 2) < myCamera.y) || (this.y
+	// + (this.sprite.getHeight() / 2) > (myCamera.y + myCamera.getHeight()))))
+	// {
+	// return false;
+	// } else {
+	// return true;
+	// }
+	// }
 
 	/**
 	 * 
@@ -110,9 +112,7 @@ public abstract class GameObject implements Drawable {
 	}
 
 	public void render() {
-		if (this.isSeen()) {
-			this.sprite.drawCentered((float) this.x, (float) this.y);
-		}
+		this.sprite.drawCentered((float) this.x, (float) this.y);
 	}
 
 	protected void updateBoundingBox() {
