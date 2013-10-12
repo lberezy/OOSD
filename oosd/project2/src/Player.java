@@ -9,8 +9,7 @@ public class Player extends Unit {
 	private final int _fullShield = 100;
 	private final int _firepower = 1;
 	private final int _damage = 10;
-	private final static String _spriteAsset = Game.ASSETS_PATH
-			+ "/units/player.png";
+	private final static String _spriteAsset = Game.ASSETS_PATH + "/units/player.png";
 
 	private int cooldown = 0;
 	private Boolean inCollision; // as yet unused
@@ -29,20 +28,17 @@ public class Player extends Unit {
 		if (this.y - sprite.getHeight() / 2 <= 0)
 			this.y = sprite.getHeight() / 2; // prevent leaving top of map
 		// prevent leaving bottom of map without collision
-		if (this.y + sprite.getHeight() / 2 >= (ownerWorld.mapHeight() * ownerWorld
-				.tileSize())) {
-			this.y = (ownerWorld.mapHeight() * ownerWorld.tileSize())
-					- sprite.getHeight() / 2;
+		if (this.y + sprite.getHeight() / 2 >= (ownerWorld.mapHeight() * ownerWorld.tileSize())) {
+			this.y = (ownerWorld.mapHeight() * ownerWorld.tileSize()) - sprite.getHeight() / 2;
 		}
 
 		// prevent leaving sides of map
 		if (this.x - sprite.getWidth() / 2 <= 0)
 			this.x = sprite.getWidth() / 2; // left side
 
-		if (this.x + sprite.getWidth() / 2 >= (ownerWorld.mapWidth() * ownerWorld
-				.tileSize())) { // right side
-			this.x = (ownerWorld.mapWidth() * ownerWorld.tileSize())
-					- sprite.getWidth() / 2;
+		if (this.x + sprite.getWidth() / 2 >= (ownerWorld.mapWidth() * ownerWorld.tileSize())) { // right
+																									// side
+			this.x = (ownerWorld.mapWidth() * ownerWorld.tileSize()) - sprite.getWidth() / 2;
 		}
 	}
 
@@ -57,8 +53,7 @@ public class Player extends Unit {
 														// of map
 
 		// prevent leaving bottom of map without collision
-		if (this.y + sprite.getHeight() / 2 >= camera.y + camera.getHeight()
-				&& isCollisionUp() == false) {
+		if (this.y + sprite.getHeight() / 2 >= camera.y + camera.getHeight() && isCollisionUp() == false) {
 			this.y = camera.y + camera.getHeight() - sprite.getHeight() / 2;
 		}
 
@@ -82,9 +77,7 @@ public class Player extends Unit {
 
 		for (i = -1; i <= 1; i += 2) {
 			for (j = -1; j <= 1; j += 2) {
-				if (ownerWorld.blockAtPoint(new Point2D(this.x + i
-						* sprite.getWidth() / 2, this.y + j
-						* sprite.getHeight() / 2))) {
+				if (ownerWorld.blockAtPoint(this.x + i * sprite.getWidth() / 2, this.y + j * sprite.getHeight() / 2)) {
 					return true;
 				}
 			}
@@ -128,8 +121,7 @@ public class Player extends Unit {
 		deltaY = (-_baseSpeed * delta) + (_moveSpeed * dir_y * delta);
 		deltaX = _moveSpeed * dir_x * delta;
 
-		if (!(isCollisionRight() && deltaX > 0 || isCollisionLeft()
-				&& deltaX < 0)) {
+		if (!(isCollisionRight() && deltaX > 0 || isCollisionLeft() && deltaX < 0)) {
 			this.x += deltaX;
 		}
 

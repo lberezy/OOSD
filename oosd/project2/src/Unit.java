@@ -28,23 +28,19 @@ public abstract class Unit extends GameObject implements Drawable {
 	}
 
 	protected Boolean isCollisionUp() {
-		return ownerWorld.blockAtPoint((int) this.x,
-				(int) this.y - sprite.getHeight() / 2);
+		return ownerWorld.blockAtPoint(this.x, this.y - sprite.getHeight() / 2);
 	}
 
 	protected Boolean isCollisionDown() {
-		return ownerWorld.blockAtPoint((int) this.x,
-				(int) this.y + sprite.getHeight() / 2);
+		return ownerWorld.blockAtPoint(this.x, this.y + sprite.getHeight() / 2);
 	}
 
 	protected Boolean isCollisionLeft() {
-		return ownerWorld.blockAtPoint((int) this.x - sprite.getWidth() / 2,
-				(int) this.y);
+		return ownerWorld.blockAtPoint(this.x - (sprite.getWidth() / 2), this.y);
 	}
 
 	protected Boolean isCollisionRight() {
-		return ownerWorld.blockAtPoint((int) this.x + sprite.getWidth() / 2,
-				(int) this.y);
+		return ownerWorld.blockAtPoint(this.x + (sprite.getWidth() / 2), this.y);
 	}
 
 }
