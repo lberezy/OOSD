@@ -119,8 +119,12 @@ public abstract class GameObject implements Drawable {
 		this.boundingBox.setLocation((float) this.x - sprite.getWidth() / 2, (float) this.y - sprite.getHeight() / 2);
 	}
 
+	/**
+	 * Sends a message to the owner world to schedule this object to be
+	 * destroyed.
+	 */
 	public void cleanup() {
-		this.ownerWorld.addToCleanup(this);
+		this.ownerWorld.registerCleanup(this);
 	}
 
 	public void update(int delta) {
