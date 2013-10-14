@@ -32,6 +32,7 @@ public class World {
 	private int tileHeight;
 	private ArrayList<Missile> missiles = new ArrayList<Missile>();
 	private ArrayList<Enemy> enemies = new ArrayList<Enemy>();
+	private ArrayList<Item> items = new ArrayList<Item>();
 	private ArrayList<GameObject> cleanup = new ArrayList<GameObject>();
 	private ArrayList<GameObject> onScreen = new ArrayList<GameObject>();
 
@@ -54,6 +55,7 @@ public class World {
 		// this.player = new Player(1296, 13716, this);
 
 		createUnits(Game.DATA_PATH + "/units.csv");
+		createItems(Game.DATA_PATH + "/items.csv");
 
 		// create camera
 		this.worldCamera = new Camera(1296, 13488, // camera starting location
@@ -127,6 +129,37 @@ public class World {
 		}
 	}
 
+	private void createItems(String unitsFile) {
+		BufferedReader reader = null;
+		try {
+			File file = new File(unitsFile);
+			reader = new BufferedReader(new FileReader(file));
+
+			String line;
+			String[] tokens;
+			while ((line = reader.readLine()) != null) {
+				tokens = line.split(","); // csv splitting
+
+				// print the tokens
+				for (String s : tokens) {
+					System.out.println(s);
+					// item name, x, y
+					createItem(tokens[0], Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]));
+				}
+
+			}
+
+		} catch (Exception e) {
+			System.err.println("Error: " + e.getMessage());
+		} finally {
+			try {
+				reader.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
 	private void createUnit(String unitString, int x, int y) throws SlickException {
 		Units unit = Units.valueOf(unitString);
 		switch (unit) {
@@ -134,16 +167,34 @@ public class World {
 			player = new Player(x, y, this);
 			break;
 		case Asteroid:
-			enemies.add(new Asteroid(x, y, this));
+			new Asteroid(x, y, this);
 			break;
 		case Boss:
-			enemies.add(new Boss(x, y, this));
+			new Boss(x, y, this);
 			break;
 		case Drone:
-			enemies.add(new Drone(x, y, this));
+			new Drone(x, y, this);
 			break;
 		case Fighter:
-			enemies.add(new Fighter(x, y, this));
+			new Fighter(x, y, this);
+			break;
+		default:
+			// TODO: throw unhandled unit exception here
+			break;
+		}
+	}
+
+	private void createItem(String itemString, double x, double y) throws SlickException {
+		Items item = Items.valueOf(itemString);
+		switch (item) {
+		case Repair:
+			new RepairItem(x, y, this);
+			break;
+		case Shield:
+			new ShieldItem(x, y, this);
+			break;
+		case Firepower:
+			new FirepowerItem(x, y, this);
 			break;
 		default:
 			// TODO: throw unhandled unit exception here
@@ -186,9 +237,10 @@ public class World {
 	public void update(double dir_x, double dir_y, boolean firing, int delta) throws SlickException {
 		worldCamera.update(delta, new Point2D(player.getX(), player.getY()));
 		player.update(dir_x, dir_y, firing, delta);
+		updateItems(delta);
 		updateEnemies(delta);
 		updateMissiles(delta);
-		runCleanup();
+		Cleanup();
 	}
 
 	/**
@@ -198,15 +250,12 @@ public class World {
 	 *            The Slick graphics object, used for drawing.
 	 */
 	public void render(Graphics g) throws SlickException {
-		g.translate(-(float) worldCamera.x, -(float) worldCamera.y); // move the
-																		// graphics
-																		// coordinates
-																		// relative
-																		// to
-																		// camera
+		// move graphics coords relative to camera
+		g.translate(-(float) worldCamera.x, -(float) worldCamera.y);
 		// camera location is now (0, 0) for drawing
 		drawMapRegion((int) worldCamera.x, (int) worldCamera.y, this.mapWidth, this.mapHeight);
 		player.render();
+		renderItems();
 		renderEnemies();
 		renderMissiles();
 		// for debugging
@@ -223,19 +272,30 @@ public class World {
 			g.resetTransform();
 			g.drawString("Missile collection: " + missiles.size(), 0, 20);
 			g.drawString("onScreen: " + onScreen.size(), 0, 40);
+			g.flush();
 
 		}
 		g.resetTransform(); // leave graphics coordinates as they were found
 		onScreen.clear();
-		panel.render(g, player.getShield(), player.getFullShield(), player.getFirepower()); // render
-																							// panel
-																							// on
-																							// top
-																							// always
+		System.out.println("On Screen: " + onScreen.size());
+		// render panel on top
+		panel.render(g, player.getShield(), player.getFullShield(), player.getFirepower());
 	}
 
+	/**
+	 * Draws a map region with top-left game pixel coordinates. All parameters
+	 * in pixels.
+	 * 
+	 * @param x
+	 *            Camera top-left coordinate
+	 * @param y
+	 *            Camera top-left coordinate
+	 * @param width
+	 *            View width in pixels
+	 * @param height
+	 *            View height in pixels
+	 */
 	public void drawMapRegion(int x, int y, int width, int height) {
-		/** Attempts to render only the tiles being seen by the camera */
 		// variables in terms of map tiles
 		int offsetX = x % tileWidth;
 		int offsetY = y % tileHeight;
@@ -282,6 +342,10 @@ public class World {
 		}
 	}
 
+	public void registerEnemy(Enemy o) {
+		this.enemies.add(o);
+	}
+
 	private void renderEnemies() {
 		for (Enemy e : enemies) {
 			if (worldCamera.canSee(e)) {
@@ -291,13 +355,35 @@ public class World {
 		}
 	}
 
-	private void runCleanup() {
+	private void Cleanup() {
 		for (GameObject o : cleanup) {
 			o.destroy();
 		}
 	}
 
-	public void addToCleanup(GameObject o) {
+	public void registerCleanup(GameObject o) {
 		this.cleanup.add(o);
 	}
+
+	public void registerItem(Item o) {
+		this.items.add(o);
+	}
+
+	public void updateItems(int delta) {
+		for (Item i : items) {
+			if (worldCamera.canSee(i)) {
+				i.update(delta);
+				onScreen.add(i);
+			}
+		}
+	}
+
+	public void renderItems() {
+		for (Item i : items) {
+			if (worldCamera.canSee(i)) {
+				i.render();
+			}
+		}
+	}
+
 }

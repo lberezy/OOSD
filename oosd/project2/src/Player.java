@@ -7,7 +7,7 @@ public class Player extends Unit {
 	private final static double _baseSpeed = 0.25;
 	private final static double _moveSpeed = 0.4;
 	private final int _fullShield = 100;
-	private final int _firepower = 1;
+	private final int _firepower = 0;
 	private final int _damage = 10;
 	private final static String _spriteAsset = Game.ASSETS_PATH + "/units/player.png";
 
