@@ -108,12 +108,7 @@ public class World {
 			String[] tokens;
 			while ((line = reader.readLine()) != null) {
 				tokens = line.split(","); // csv splitting
-
-				// print the tokens
-				for (String s : tokens) {
-					// unit name, x, y
-					createUnit(tokens[0], Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]));
-				}
+				createUnit(tokens[0], Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]));
 
 			}
 
@@ -138,12 +133,7 @@ public class World {
 			String[] tokens;
 			while ((line = reader.readLine()) != null) {
 				tokens = line.split(","); // csv splitting
-
-				// print the tokens
-				for (String s : tokens) {
-					// item name, x, y
-					createItem(tokens[0], Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]));
-				}
+				createItem(tokens[0], Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]));
 
 			}
 
@@ -159,6 +149,7 @@ public class World {
 	}
 
 	private void createUnit(String unitString, int x, int y) throws SlickException {
+
 		Units unit = Units.valueOf(unitString);
 		switch (unit) {
 		case Player:
