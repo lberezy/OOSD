@@ -13,7 +13,12 @@ public class Asteroid extends Enemy {
 	@Override
 	public void update(int delta) {
 		// TODO Auto-generated method stub
+		double deltaY = _moveSpeed * delta;
 
+		if (!(isCollisionUp() && deltaY < 0 || isCollisionDown() && deltaY > 0)) {
+			this.y += deltaY;
+		}
+		updateBoundingBox();
 	}
 
 }
