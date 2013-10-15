@@ -4,19 +4,24 @@ import org.newdawn.slick.SlickException;
 public class Fighter extends Alien {
 
 	private final static String _spriteAsset = Game.ASSETS_PATH + "/units/fighter.png";
-	private final static double _moveSpeed = 0.2;
 	private int cooldown = 0;
-	private int firepower = 0;
+	private final int _fullShield = 24;
+	private final int _damage = 9;
+	private final int _firepower = 0;
 
 	public Fighter(double x, double y, World world) throws SlickException {
 		super(x, y, new Image(_spriteAsset), world);
-		// TODO Auto-generated constructor stub
+		this.firepower = _firepower;
+		this.fullShield = _fullShield;
+		this.shield = fullShield;
+		this.damage = _damage;
 	}
 
 	@Override
 	public void update(int delta) {
 		double deltaY = _moveSpeed * delta;
-		if (!(isCollisionDown() && delta < 0)) {
+
+		if (!(isCollisionUp() && deltaY < 0 || isCollisionDown() && deltaY > 0)) {
 			this.y += deltaY;
 		}
 		cooldown(delta);
@@ -36,7 +41,7 @@ public class Fighter extends Alien {
 			return;
 		try {
 			new Missile(this.x, this.y + 25, true, this.ownerWorld);
-			cooldown = 300 - (80 * firepower);
+			cooldown = 300 - (80 * _firepower);
 		} catch (SlickException e) {
 			if (Game.debug)
 				System.err.println("Error: Unable to create missile!");

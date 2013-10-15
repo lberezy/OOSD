@@ -111,7 +111,6 @@ public class World {
 
 				// print the tokens
 				for (String s : tokens) {
-					System.out.println(s);
 					// unit name, x, y
 					createUnit(tokens[0], Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]));
 				}
@@ -142,7 +141,6 @@ public class World {
 
 				// print the tokens
 				for (String s : tokens) {
-					System.out.println(s);
 					// item name, x, y
 					createItem(tokens[0], Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]));
 				}
@@ -309,81 +307,176 @@ public class World {
 				mapHeight);
 	}
 
+	/**
+	 * Register object with the world update/render routines. Should only be
+	 * called inside GameObject derived constructor.
+	 * 
+	 * @param m
+	 *            Object to register.
+	 */
 	public void registerMissile(Missile m) {
 		this.missiles.add(m);
 	}
 
+	/**
+	 * Removes the game object from world list.
+	 * 
+	 * @param m
+	 *            Object to remove.
+	 */
 	public void removeMissile(Missile m) {
 		this.missiles.remove(m);
 	}
 
+	/**
+	 * Invokes the render method for all objects of type registered in world.
+	 */
 	private void renderMissiles() {
 		for (Missile m : missiles) {
 			m.render();
+			onScreen.add(m);
 		}
 	}
 
+	/**
+	 * Invokes the update method for all objects of type registered in world.
+	 */
 	private void updateMissiles(int delta) {
 		for (Missile m : missiles) {
-			m.update(delta);
 			// build list of missiles to remove
 			if (worldCamera.canSee(m) == false) {
 				cleanup.add(m);
+			} else {
+				m.update(delta);
 			}
 		}
 	}
 
+	/**
+	 * Invokes the update method for all objects of type registered in world.
+	 */
 	private void updateEnemies(int delta) {
 		for (Enemy e : enemies) {
 			if (worldCamera.canSee(e)) {
 				e.update(delta);
+			}
+		}
+	}
+
+	/**
+	 * Register object with the world update/render routines. Should only be
+	 * called inside GameObject derived constructor.
+	 * 
+	 * @param m
+	 *            Object to register.
+	 */
+	public void registerEnemy(Enemy o) {
+		this.enemies.add(o);
+	}
+
+	/**
+	 * Removes the game object from world list.
+	 * 
+	 * @param m
+	 *            Object to remove.
+	 */
+	public void removeEnemy(Enemy o) {
+		this.enemies.remove(o);
+	}
+
+	/**
+	 * Invokes the render method for all objects of type registered in world.
+	 */
+	private void renderEnemies() {
+		for (Enemy e : enemies) {
+			if (worldCamera.canSee(e)) {
+				e.render();
 				onScreen.add(e);
 			}
 		}
 	}
 
-	public void registerEnemy(Enemy o) {
-		this.enemies.add(o);
-	}
-
-	private void renderEnemies() {
-		for (Enemy e : enemies) {
-			if (worldCamera.canSee(e)) {
-				e.render();
-
-			}
-		}
-	}
-
+	/**
+	 * Invokes the world cleanup routine. Calls back to objects to run their
+	 * destroy routines. Usual side effect de-registers object from world.
+	 */
 	private void Cleanup() {
 		for (GameObject o : cleanup) {
 			o.destroy();
 		}
 	}
 
+	/**
+	 * Adds an object to the list of objects to be cleaned up. Clean up should
+	 * be invoked once for each world update.
+	 * 
+	 * @param o
+	 *            GameObject to be added to clean up schedule.
+	 */
 	public void registerCleanup(GameObject o) {
 		this.cleanup.add(o);
 	}
 
+	/**
+	 * Register object with the world update/render routines. Should only be
+	 * called inside GameObject derived constructor.
+	 * 
+	 * @param m
+	 *            Object to register.
+	 */
 	public void registerItem(Item o) {
 		this.items.add(o);
 	}
 
+	/**
+	 * Invokes the update method for all objects of type registered in world.
+	 */
 	public void updateItems(int delta) {
 		for (Item i : items) {
 			if (worldCamera.canSee(i)) {
 				i.update(delta);
+			}
+		}
+	}
+
+	/**
+	 * Invokes the render method for all objects of type registered in world.
+	 */
+	public void renderItems() {
+		for (Item i : items) {
+			if (worldCamera.canSee(i)) {
+				i.render();
 				onScreen.add(i);
 			}
 		}
 	}
 
-	public void renderItems() {
-		for (Item i : items) {
-			if (worldCamera.canSee(i)) {
-				i.render();
+	/**
+	 * Removes the game object from world list.
+	 * 
+	 * @param m
+	 *            Object to remove.
+	 */
+	public void removeItem(Item item) {
+		this.items.remove(item);
+	}
+
+	/**
+	 * 
+	 * @param o
+	 *            Object to find collisions with
+	 * @return Returns an ArrayList of on-screen objects colliding with o.
+	 */
+	ArrayList<GameObject> getCollisions(GameObject o) {
+		ArrayList<GameObject> output = new ArrayList<GameObject>();
+		for (GameObject z : onScreen) {
+			// add objects colliding with o that aren't itself.
+			if ((z.equals(o) == false) && o.getBoundingBox().intersects(z.getBoundingBox())) {
+				output.add(z);
 			}
 		}
+		return output;
+
 	}
 
 }

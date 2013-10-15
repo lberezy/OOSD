@@ -7,4 +7,12 @@ public abstract class Item extends GameObject {
 		// TODO Auto-generated constructor stub
 	}
 
+	public void collect() {
+		this.getOwnerWorld().registerCleanup(this);
+	}
+
+	public void destroy() {
+		this.getOwnerWorld().removeItem(this);
+	}
+
 }

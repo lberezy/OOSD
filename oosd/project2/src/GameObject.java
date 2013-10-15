@@ -128,9 +128,11 @@ public abstract class GameObject implements Drawable {
 	}
 
 	public void update(int delta) {
+
 	}
 
 	public void destroy() {
+		// TODO Auto-generated method stub
 
 	}
 
