@@ -7,6 +7,7 @@ public class Player extends Unit {
 	private final static double _baseSpeed = 0.25;
 	private final static double _moveSpeed = 0.4;
 	private final int _fullShield = 100;
+	private final int _maxFirepower = 3;
 	private final int _firepower = 0;
 	private final int _damage = 10;
 	private final static String _spriteAsset = Game.ASSETS_PATH + "/units/player.png";
@@ -135,6 +136,28 @@ public class Player extends Unit {
 		mapBounds();
 		cameraBounds();
 		updateBoundingBox();
+		// item collisions
+		for (GameObject o : this.ownerWorld.getCollisions(this)) {
+			if (o instanceof Item) {
+				this.consumeItem((Item) o);
+			}
+		}
+		super.update(delta); // handles collision with other units
+	}
+
+	private void consumeItem(Item item) {
+		if (item instanceof RepairItem) {
+			this.shield = fullShield;
+		} else if (item instanceof ShieldItem) {
+			this.shield += 40;
+			this.fullShield += 40;
+		} else if (item instanceof FirepowerItem)
+			this.firepower += 1;
+		if (this.firepower > _maxFirepower) {
+			this.firepower = _maxFirepower;
+			return; // disregard item, don't remove from world
+		}
+		item.getOwnerWorld().registerCleanup(item);
 	}
 
 	private void cooldown(int delta) {
@@ -148,13 +171,17 @@ public class Player extends Unit {
 		if (cooldown > 0)
 			return;
 		try {
-			new Missile(this.x, this.y - 25, false, this.ownerWorld);
+			new Missile(this.x, this.y - 50, false, this.ownerWorld);
 			cooldown = 300 - (80 * firepower);
 		} catch (SlickException e) {
 			if (Game.debug)
 				System.err.println("Error: Unable to create missile!");
 			e.printStackTrace();
 		}
+	}
+
+	public void destroy() {
+		// check if there are enough lives and respawn if possible at checkpoint
 	}
 
 	@Override

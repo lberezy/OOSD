@@ -30,15 +30,13 @@ public class World {
 	private int tileSize;
 	private int tileWidth;
 	private int tileHeight;
+	private int[] checkpoints = { 13716, 9756, 7812, 5796, 2844 };
+	private static int checkpoint = 0;
 	private ArrayList<Missile> missiles = new ArrayList<Missile>();
 	private ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 	private ArrayList<Item> items = new ArrayList<Item>();
 	private ArrayList<GameObject> cleanup = new ArrayList<GameObject>();
 	private ArrayList<GameObject> onScreen = new ArrayList<GameObject>();
-
-	// private ArrayList<? extends GameObject> missiles, enemies, items,
-	// visible;
-	// private ArrayList<? extends GameObject> j = new ArrayList<Missile>();
 
 	public World() throws SlickException {
 		/* Constructs the game world */
@@ -79,8 +77,6 @@ public class World {
 		 * block movement returns false if the point is invalid anyway
 		 */
 
-		// TODO: use if (worldMap.isValidPoint(x, y)) test, but method is not
-		// working correctly at this stage
 		int tileX = (int) (x / tileSize);
 		int tileY = (int) (y / tileSize);
 
@@ -91,11 +87,6 @@ public class World {
 
 		}
 
-		// following method also works, but is less efficient
-
-		// int tileID = worldMap.getTileId(x/tileWidth, y/tileHeight, 0); // get
-		// tileID at point, layer 0 of map
-		// return (worldMap.getTileProperty(tileID, "block", "0").equals("1"));
 	}
 
 	private void createUnits(String unitsFile) {
@@ -226,10 +217,24 @@ public class World {
 	public void update(double dir_x, double dir_y, boolean firing, int delta) throws SlickException {
 		worldCamera.update(delta, new Point2D(player.getX(), player.getY()));
 		player.update(dir_x, dir_y, firing, delta);
+		if (worldCamera.canSee(player))
+			onScreen.add(player);
+		System.out.println(":: " + onScreen.size());
 		updateItems(delta);
 		updateEnemies(delta);
 		updateMissiles(delta);
+		System.out.println(onScreen.size());
 		Cleanup();
+		System.out.println(onScreen.size());
+		for (GameObject o : onScreen) {
+			System.out.println(o.toString());
+		}
+
+		onScreen.clear(); // clear onScreen objects after update methods are
+							// done with them
+		// handle updating checkpoint
+		if (player.getY() > checkpoints[checkpoint] && (checkpoint < (checkpoints.length - 1)))
+			checkpoint++;
 	}
 
 	/**
@@ -249,7 +254,7 @@ public class World {
 		renderMissiles();
 		// for debugging
 		if (Game.debug) {
-			g.setColor(Color.orange);
+			g.setColor(Color.green);
 
 			g.drawString("X tile: " + (int) player.x / tileSize, (float) player.x, (float) player.y);
 			g.drawString("Y tile: " + (int) player.y / tileSize, (float) player.x, (float) player.y + 20);
@@ -257,16 +262,21 @@ public class World {
 			g.drawOval((float) player.x, (float) player.y + 32, 1f, 1f, 6);
 			g.drawOval((float) player.x - 32, (float) player.y, 1f, 1f, 6);
 			g.drawOval((float) player.x + 32, (float) player.y, 1f, 1f, 6);
-			g.draw(player.getBoundingBox());
+			for (GameObject o : onScreen) {
+				g.draw(o.getBoundingBox());
+				if (o instanceof Unit) {
+					g.drawString("Shield: " + ((Unit) o).shield, (float) o.x, (float) o.y - 20);
+				}
+			}
 			g.resetTransform();
 			g.drawString("Missile collection: " + missiles.size(), 0, 20);
 			g.drawString("onScreen: " + onScreen.size(), 0, 40);
+			g.drawString("checkpoint: " + checkpoint, 0, 60);
+
 			g.flush();
 
 		}
 		g.resetTransform(); // leave graphics coordinates as they were found
-		onScreen.clear();
-		System.out.println("On Screen: " + onScreen.size());
 		// render panel on top
 		panel.render(g, player.getShield(), player.getFullShield(), player.getFirepower());
 	}
@@ -458,7 +468,7 @@ public class World {
 	 *            Object to find collisions with
 	 * @return Returns an ArrayList of on-screen objects colliding with o.
 	 */
-	ArrayList<GameObject> getCollisions(GameObject o) {
+	public ArrayList<GameObject> getCollisions(GameObject o) {
 		ArrayList<GameObject> output = new ArrayList<GameObject>();
 		for (GameObject z : onScreen) {
 			// add objects colliding with o that aren't itself.
