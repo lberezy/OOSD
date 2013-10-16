@@ -30,6 +30,7 @@ public class Drone extends Alien {
 			this.y += deltaY;
 		}
 		updateBoundingBox();
+		super.update(delta);
 	}
 
 }

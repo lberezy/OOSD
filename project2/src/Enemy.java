@@ -19,4 +19,11 @@ public abstract class Enemy extends Unit {
 	public void destroy() {
 		this.getOwnerWorld().removeEnemy(this);
 	}
+
+	public void update(int delta) {
+		// deal damage to self when coliding with terrain
+		// if (isTerrainCollision())
+		// recieveDamage(this.damage);
+		super.update(delta);
+	}
 }

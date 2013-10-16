@@ -19,6 +19,7 @@ public class Asteroid extends Enemy {
 			this.y += deltaY;
 		}
 		updateBoundingBox();
+		super.update(delta);
 	}
 
 }

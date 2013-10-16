@@ -27,6 +27,7 @@ public class Fighter extends Alien {
 		cooldown(delta);
 		fireMissile();
 		updateBoundingBox();
+		super.update(delta);
 	}
 
 	private void cooldown(int delta) {
@@ -40,7 +41,7 @@ public class Fighter extends Alien {
 		if (cooldown > 0)
 			return;
 		try {
-			new Missile(this.x, this.y + 25, true, this.ownerWorld);
+			new Missile(this.x, this.y + 50, true, this.ownerWorld);
 			cooldown = 300 - (80 * _firepower);
 		} catch (SlickException e) {
 			if (Game.debug)

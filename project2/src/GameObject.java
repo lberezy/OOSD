@@ -132,7 +132,6 @@ public abstract class GameObject implements Drawable {
 	}
 
 	public void destroy() {
-		// TODO Auto-generated method stub
 
 	}
 

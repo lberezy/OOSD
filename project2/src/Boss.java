@@ -2,8 +2,8 @@ import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
 public class Boss extends Alien {
-	private final static int _leftBound = 1013;
-	private final static int _rightBound = 1589;
+	private final static int _leftBound = 1024;
+	private final static int _rightBound = 1580;
 	private final static String _spriteAsset = Game.ASSETS_PATH + "/units/boss.png";
 	private boolean bounce = false;
 	private int cooldown = 0;
@@ -24,18 +24,20 @@ public class Boss extends Alien {
 	public void update(int delta) {
 		// TODO Auto-generated method stub
 		double deltaX = _moveSpeed * delta;
-		if (bounce && (this.getX() > _rightBound)) {
-			this.x -= deltaX;
-			bounce = !bounce;
-		} else if (!bounce && (this.getX() < _leftBound)) {
+
+		if (this.x < _leftBound)
+			bounce = true;
+		if (this.x > _rightBound)
+			bounce = false;
+		if (bounce) {
 			this.x += deltaX;
-			bounce = !bounce;
 		} else {
-			this.x += deltaX;
+			this.x -= deltaX;
 		}
 		cooldown(delta);
 		fireMissile();
 		updateBoundingBox();
+		super.update(delta);
 	}
 
 	private void cooldown(int delta) {
@@ -49,7 +51,7 @@ public class Boss extends Alien {
 		if (cooldown > 0)
 			return;
 		try {
-			new Missile(this.x, this.y + 25, true, this.ownerWorld);
+			new Missile(this.x, this.y + 50, true, this.ownerWorld);
 			cooldown = 300 - (80 * _firepower);
 		} catch (SlickException e) {
 			if (Game.debug)
