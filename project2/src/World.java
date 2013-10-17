@@ -15,7 +15,11 @@ import java.util.ArrayList;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.particles.ConfigurableEmitter;
+import org.newdawn.slick.particles.ParticleIO;
+import org.newdawn.slick.particles.ParticleSystem;
 
 /**
  * Represents the entire game world. (Designed to be instantiated just once for
@@ -26,6 +30,9 @@ public class World {
 	private Player player;
 	private Panel panel;
 	private Camera worldCamera;
+	private ParticleSystem particleSystem;
+	private ConfigurableEmitter emitter;
+
 	private int mapWidth;
 	private int mapHeight;
 	private int tileSize;
@@ -72,6 +79,18 @@ public class World {
 		this.tileSize = worldMap.getTileWidth();
 		this.tileWidth = worldMap.getTileWidth();
 		this.tileHeight = worldMap.getTileHeight();
+
+		if (Game.particles) {
+			try {
+				Image particle = new Image(Game.ASSETS_PATH + "/particles/particle.png");
+				particleSystem = new ParticleSystem(particle, 2000);
+				emitter = ParticleIO.loadEmitter(new File(Game.ASSETS_PATH + "/particles/emitter.xml"));
+				emitter.setPosition((float) player.x, (float) player.y);
+				particleSystem.addEmitter(emitter);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public boolean isBossDefeated() {
@@ -279,6 +298,12 @@ public class World {
 			// System.out.println(checkpoint);
 			// System.out.println(checkpoints[checkpoint]);
 		}
+
+		if (Game.particles) {
+			emitter.setPosition((float) player.x, (float) player.y);
+			particleSystem.update(delta);
+
+		}
 		if (player.getY() < checkpoints[checkpoint + 1] && (checkpoint < (checkpoints.length)))
 			checkpoint += 1;
 	}
@@ -321,6 +346,10 @@ public class World {
 
 			g.flush();
 
+		}
+
+		if (Game.particles) {
+			particleSystem.render();
 		}
 		g.resetTransform(); // leave graphics coordinates as they were found
 		// render panel on top
