@@ -20,6 +20,7 @@ public class Game extends BasicGame {
 	public static final String ASSETS_PATH = "assets";
 	public static final String DATA_PATH = "data";
 	public static final Boolean debug = false;
+	public static final Boolean particles = true;
 
 	/** The game state. */
 	private World world;
