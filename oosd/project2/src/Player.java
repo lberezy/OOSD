@@ -121,14 +121,19 @@ public class Player extends Unit {
 		double deltaX = 0, deltaY = 0;
 		deltaY = (-_baseSpeed * delta) + (_moveSpeed * dir_y * delta);
 		deltaX = _moveSpeed * dir_x * delta;
+		if (ownerWorld.isBossDefeated() == false) { // allow movement while
+													// boss isn't defeated
+			if (!(isCollisionRight() && deltaX > 0 || isCollisionLeft() && deltaX < 0)) {
+				this.x += deltaX;
+			}
 
-		if (!(isCollisionRight() && deltaX > 0 || isCollisionLeft() && deltaX < 0)) {
-			this.x += deltaX;
+			if (!(isCollisionUp() && deltaY < 0 || isCollisionDown() && deltaY > 0)) {
+				this.y += deltaY;
+			}
+		} else {
+			this.y -= Math.abs(deltaY); // move forward only
 		}
 
-		if (!(isCollisionUp() && deltaY < 0 || isCollisionDown() && deltaY > 0)) {
-			this.y += deltaY;
-		}
 		if (firing) {
 			fireMissile();
 		}
@@ -143,6 +148,13 @@ public class Player extends Unit {
 			}
 		}
 		super.update(delta); // handles collision with other units
+
+		if (shield <= 0 || !ownerWorld.getCamera().canSee(this)) { // this kills
+																	// the
+																	// player
+																	// ;_;
+			this.ownerWorld.playerDeath();
+		}
 	}
 
 	private void consumeItem(Item item) {
@@ -191,6 +203,13 @@ public class Player extends Unit {
 		// Should be fine in this one case (only player has different type
 		// signature)
 
+	}
+
+	/**
+	 * Handles state where player is to be restored after death.
+	 */
+	public void onRestore() {
+		this.shield = fullShield;
 	}
 
 }

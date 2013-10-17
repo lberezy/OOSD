@@ -21,9 +21,9 @@ public abstract class Enemy extends Unit {
 	}
 
 	public void update(int delta) {
-		// deal damage to self when coliding with terrain
-		// if (isTerrainCollision())
-		// recieveDamage(this.damage);
+		// deal damage to self when colliding with terrain
+		if (isTerrainCollision() && (this instanceof Fighter))
+			recieveDamage(this.damage);
 		super.update(delta);
 	}
 }

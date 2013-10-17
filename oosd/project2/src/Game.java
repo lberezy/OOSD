@@ -8,6 +8,7 @@ import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
+import org.newdawn.slick.Music;
 import org.newdawn.slick.SlickException;
 
 /**
@@ -18,7 +19,7 @@ public class Game extends BasicGame {
 	/** Location of the "assets" directory. */
 	public static final String ASSETS_PATH = "assets";
 	public static final String DATA_PATH = "data";
-	public static final Boolean debug = true;
+	public static final Boolean debug = false;
 
 	/** The game state. */
 	private World world;
@@ -52,6 +53,8 @@ public class Game extends BasicGame {
 	@Override
 	public void init(GameContainer gc) throws SlickException {
 		world = new World();
+		Music backgroundMusic = new Music(Game.ASSETS_PATH + "/music/a_piece_of_magic.mod");
+		backgroundMusic.loop();
 	}
 
 	/**

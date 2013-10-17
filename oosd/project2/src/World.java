@@ -4,6 +4,7 @@
  * Derived Author: Lucas Berezy (588 236)
  * Based off supplied skeleton code. Said code reproduces works from copyrighted titles
  * Chromium B.S.U. and (Artistic License) and Battle for Wesnoth (GNU General Public License v.2+).
+ * Music: "A piece of magic" - Lizardking (No explicit license/Scene license)
  */
 
 import java.io.BufferedReader;
@@ -30,8 +31,10 @@ public class World {
 	private int tileSize;
 	private int tileWidth;
 	private int tileHeight;
-	private int[] checkpoints = { 13716, 9756, 7812, 5796, 2844 };
-	private static int checkpoint = 0;
+	private int[] checkpoints = { 13716, 9756, 7812, 5796, 2844, 0 };
+	private int checkpoint = 0;
+	private boolean bossDefeated = false;
+
 	private ArrayList<Missile> missiles = new ArrayList<Missile>();
 	private ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 	private ArrayList<Item> items = new ArrayList<Item>();
@@ -52,7 +55,7 @@ public class World {
 		// TODO: Implement csv loading
 		// this.player = new Player(1296, 13716, this);
 
-		createUnits(Game.DATA_PATH + "/units.csv");
+		createUnits(Game.DATA_PATH + "/units.csv", true);
 		createItems(Game.DATA_PATH + "/items.csv");
 
 		// create camera
@@ -69,6 +72,15 @@ public class World {
 		this.tileSize = worldMap.getTileWidth();
 		this.tileWidth = worldMap.getTileWidth();
 		this.tileHeight = worldMap.getTileHeight();
+	}
+
+	public boolean isBossDefeated() {
+		return this.bossDefeated;
+	}
+
+	public void defeatBoss() {
+		this.bossDefeated = true;
+		player.x = 1296;
 	}
 
 	public Boolean blockAtPoint(double x, double y) {
@@ -89,7 +101,7 @@ public class World {
 
 	}
 
-	private void createUnits(String unitsFile) {
+	private void createUnits(String unitsFile, boolean initial) {
 		BufferedReader reader = null;
 		try {
 			File file = new File(unitsFile);
@@ -99,7 +111,7 @@ public class World {
 			String[] tokens;
 			while ((line = reader.readLine()) != null) {
 				tokens = line.split(","); // csv splitting
-				createUnit(tokens[0], Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]));
+				createUnit(tokens[0], Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]), initial);
 
 			}
 
@@ -139,12 +151,23 @@ public class World {
 		}
 	}
 
-	private void createUnit(String unitString, int x, int y) throws SlickException {
+	/**
+	 * Creates specified unit at location.
+	 * 
+	 * @param unitString
+	 * @param x
+	 * @param y
+	 * @param initial
+	 *            Player only created if initial is true.
+	 * @throws SlickException
+	 */
+	private void createUnit(String unitString, int x, int y, boolean initial) throws SlickException {
 
 		Units unit = Units.valueOf(unitString);
 		switch (unit) {
 		case Player:
-			player = new Player(x, y, this);
+			if (initial)
+				player = new Player(x, y, this);
 			break;
 		case Asteroid:
 			new Asteroid(x, y, this);
@@ -202,6 +225,31 @@ public class World {
 		return this.tileSize;
 	}
 
+	public int getCheckpointY() {
+		return checkpoints[checkpoint];
+	}
+
+	/**
+	 * Handles the player death event. Moves player to correct position based on
+	 * checkpoint reached. Makes call to player to do onRestore() event method.
+	 * (restore shield, etc) Clears enemies from world and reloads them. Clears
+	 * all missiles from world. Centers camera on player. Anyone can kill the
+	 * player.
+	 */
+	public void playerDeath() {
+		// move player
+		player.x = 1296 + player.getSprite().getWidth() / 2;
+		player.y = checkpoints[checkpoint];
+		player.onRestore();
+		enemies.clear();
+		missiles.clear();
+		onScreen.clear();
+		createUnits(Game.DATA_PATH + "/units.csv", false);
+		worldCamera.x = player.x - worldCamera.getWidth() / 2; // horizontal
+																// camera
+		worldCamera.y = player.y - (worldCamera.getHeight() - 145);
+	}
+
 	/**
 	 * Update the game state for a frame.
 	 * 
@@ -219,22 +267,20 @@ public class World {
 		player.update(dir_x, dir_y, firing, delta);
 		if (worldCamera.canSee(player))
 			onScreen.add(player);
-		System.out.println(":: " + onScreen.size());
 		updateItems(delta);
 		updateEnemies(delta);
 		updateMissiles(delta);
-		System.out.println(onScreen.size());
 		Cleanup();
-		System.out.println(onScreen.size());
-		for (GameObject o : onScreen) {
-			System.out.println(o.toString());
-		}
 
 		onScreen.clear(); // clear onScreen objects after update methods are
 							// done with them
 		// handle updating checkpoint
-		if (player.getY() > checkpoints[checkpoint] && (checkpoint < (checkpoints.length - 1)))
-			checkpoint++;
+		if (Game.debug) {
+			// System.out.println(checkpoint);
+			// System.out.println(checkpoints[checkpoint]);
+		}
+		if (player.getY() < checkpoints[checkpoint + 1] && (checkpoint < (checkpoints.length)))
+			checkpoint += 1;
 	}
 
 	/**
@@ -271,7 +317,7 @@ public class World {
 			g.resetTransform();
 			g.drawString("Missile collection: " + missiles.size(), 0, 20);
 			g.drawString("onScreen: " + onScreen.size(), 0, 40);
-			g.drawString("checkpoint: " + checkpoint, 0, 60);
+			g.drawString("checkpoint: " + checkpoints[checkpoint], 0, 60);
 
 			g.flush();
 
@@ -307,6 +353,12 @@ public class World {
 				mapWidth, // width of section to render (in tiles)
 				mapHeight);
 	}
+
+	/*
+	 * It would be better design to have a simpler register/update/destroy
+	 * mechanism for all GameObjects and them implement the interface here, but
+	 * was having issues with inheritance and checking.
+	 */
 
 	/**
 	 * Register object with the world update/render routines. Should only be

@@ -13,5 +13,6 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="project2/lib"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lib/ibxm.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

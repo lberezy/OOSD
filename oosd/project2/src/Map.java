@@ -14,7 +14,6 @@ public class Map extends TiledMap {
 			for (int y = 0; y < getHeight(); y++) {
 				int tileID = this.getTileId(x, y, 0); // get tileID at point,
 														// layer 0 of tilemap
-				System.out.println(x + ":" + y);
 				blockTiles[x][y] = this.getTileProperty(tileID, "block", "0").equals("1");
 			}
 		}
