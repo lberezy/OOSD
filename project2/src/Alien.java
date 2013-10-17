@@ -6,8 +6,4 @@ public abstract class Alien extends Enemy {
 		super(x, y, sprite, world);
 	}
 
-	public void update(int delta) {
-		super.update(delta);
-	}
-
 }

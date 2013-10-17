@@ -60,4 +60,9 @@ public class Boss extends Alien {
 		}
 	}
 
+	public void destroy() {
+		super.destroy();
+		this.ownerWorld.defeatBoss();
+	}
+
 }
