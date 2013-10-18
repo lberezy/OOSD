@@ -1,0 +1,13 @@
+Lucas Berezy (588 236)
+
+Added background music. (Game.music = true);
+Added particle effects trail to ship. (Game.particles = true);
+If debug mode is enabled, bounding boxes around all objects are rendered and some on-screen stats are displayed. (Game.debug = false);
+Game supports gamepads/controllers. Tested with PS3 controller (analog input works).
+
+
+Legal Notices: (no file at 'assets/README.txt')
+	Assets in this game are derived works from the following sources:
+		Chromium B.S.U (Artistic License)
+		Battle for Wesnoth (GNU General Public License v.2+).
+		Music: "A piece of magic" - Lizardking (No explicit license/Scene license)
