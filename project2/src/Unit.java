@@ -3,7 +3,6 @@ import org.newdawn.slick.Image;
 public abstract class Unit extends GameObject implements Drawable {
 	public Unit(double x, double y, Image sprite, World world) {
 		super(x, y, sprite, world);
-		// TODO Auto-generated constructor stub
 	}
 
 	protected int shield;

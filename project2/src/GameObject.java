@@ -11,6 +11,15 @@ public abstract class GameObject implements Drawable {
 	private static int IDcount = 0;
 	protected int objID;
 
+	/**
+	 * Creates a new game object, gives it a unique ID.
+	 * 
+	 * @param x
+	 * @param y
+	 * @param sprite
+	 * @param world
+	 *            Reference to world that instantiated it.
+	 */
 	public GameObject(double x, double y, Image sprite, World world) {
 		this.x = x;
 		this.y = y;
@@ -21,12 +30,15 @@ public abstract class GameObject implements Drawable {
 				(float) sprite.getWidth(), (float) sprite.getHeight());
 	}
 
+	/**
+	 * Alternate constructor using Point2D. Deprecated.
+	 * 
+	 * @param point
+	 * @param sprite
+	 * @param world
+	 */
 	public GameObject(Point2D point, Image sprite, World world) {
-		this.x = point.x;
-		this.y = point.y;
-		this.sprite = sprite;
-		this.ownerWorld = world;
-		this.objID = IDcount++;
+		this(point.x, point.y, sprite, world);
 	}
 
 	public boolean equals(Object object) {
@@ -51,33 +63,21 @@ public abstract class GameObject implements Drawable {
 		return this.getBoundingBox().intersects(obj.getBoundingBox());
 	}
 
+	/**
+	 * 
+	 * @return Rectangle object representing object's bounds.
+	 */
 	public Rectangle getBoundingBox() {
 		return this.boundingBox;
 	}
 
+	/**
+	 * 
+	 * @return Unique game objectID.
+	 */
 	public int getObjID() {
 		return this.objID;
 	}
-
-	// public boolean isSeen() {
-	// /**
-	// * Checks if object is visible to its owner world's camera.
-	// */
-	// Camera myCamera = this.ownerWorld.getCamera();
-	// double camHeight = myCamera.getHeight();
-	// double camWidth = myCamera.getWidth();
-	//
-	// if ((this.x - (this.sprite.getWidth() / 2) < myCamera.x)
-	// || (this.x + (this.sprite.getWidth() / 2) > (myCamera.x +
-	// myCamera.getWidth())
-	// || (this.y - (this.sprite.getHeight() / 2) < myCamera.y) || (this.y
-	// + (this.sprite.getHeight() / 2) > (myCamera.y + myCamera.getHeight()))))
-	// {
-	// return false;
-	// } else {
-	// return true;
-	// }
-	// }
 
 	/**
 	 * 
@@ -95,10 +95,6 @@ public abstract class GameObject implements Drawable {
 		return this.ownerWorld;
 	}
 
-	/**
-	 * 
-	 * @return Reference to world that instantiated the object.
-	 */
 	public double getX() {
 		return this.x;
 	}
@@ -107,14 +103,24 @@ public abstract class GameObject implements Drawable {
 		return this.y;
 	}
 
+	/**
+	 * 
+	 * @return Returns object's x,y coordinates as a point
+	 */
 	public Point2D getPoint() {
 		return new Point2D(this.x, this.y);
 	}
 
+	/**
+	 * Renders the object's sprite.
+	 */
 	public void render() {
 		this.sprite.drawCentered((float) this.x, (float) this.y);
 	}
 
+	/**
+	 * Updates the bounding box of the object. Call during update.
+	 */
 	protected void updateBoundingBox() {
 		this.boundingBox.setLocation((float) this.x - sprite.getWidth() / 2, (float) this.y - sprite.getHeight() / 2);
 	}

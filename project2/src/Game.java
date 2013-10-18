@@ -21,6 +21,7 @@ public class Game extends BasicGame {
 	public static final String DATA_PATH = "data";
 	public static final Boolean debug = false;
 	public static final Boolean particles = true;
+	public static final Boolean music = true;
 
 	/** The game state. */
 	private World world;
@@ -54,8 +55,10 @@ public class Game extends BasicGame {
 	@Override
 	public void init(GameContainer gc) throws SlickException {
 		world = new World();
-		Music backgroundMusic = new Music(Game.ASSETS_PATH + "/music/a_piece_of_magic.mod");
-		backgroundMusic.loop();
+		if (Game.music) {
+			Music backgroundMusic = new Music(Game.ASSETS_PATH + "/music/a_piece_of_magic.mod");
+			backgroundMusic.loop();
+		}
 	}
 
 	/**

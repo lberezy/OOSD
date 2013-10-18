@@ -23,6 +23,9 @@ public class Player extends Unit {
 		this.damage = _damage;
 	}
 
+	/**
+	 * Keeps player inside bounds of map.
+	 */
 	public void mapBounds() {
 		// handles map boundaries, treats sprite bounds as rectangle
 		// prevent leaving top of map
@@ -43,6 +46,9 @@ public class Player extends Unit {
 		}
 	}
 
+	/**
+	 * Keeps player inside bounds of camera window.
+	 */
 	public void cameraBounds() {
 
 		Camera camera = ownerWorld.getCamera();
@@ -68,12 +74,12 @@ public class Player extends Unit {
 		}
 	}
 
-	// as yet unused
+	/**
+	 * Checks 9 coordinates around the corners and sides of a rectangle around
+	 * the sprite. Not used.
+	 */
 	private Boolean isCollision() {
-		/**
-		 * Checks 9 coordinates around the corners and sides of a rectangle
-		 * around the sprite.
-		 */
+
 		int i, j;
 
 		for (i = -1; i <= 1; i += 2) {
@@ -84,24 +90,6 @@ public class Player extends Unit {
 			}
 		}
 		return false;
-	}
-
-	// unused
-	private Boolean checkVCollisions() {
-		/**
-		 * Check for collision at top and bottom of sprite
-		 * 
-		 */
-		return (isCollisionUp() || isCollisionDown());
-	}
-
-	// unused
-	private Boolean checkHCollisions() {
-		/**
-		 * Check for collision at sides of sprite
-		 * 
-		 */
-		return (isCollisionLeft() || isCollisionRight());
 	}
 
 	/**
@@ -157,6 +145,12 @@ public class Player extends Unit {
 		}
 	}
 
+	/**
+	 * Consumes an item, applies its effect appropriately.
+	 * 
+	 * @param item
+	 *            Item to consume
+	 */
 	private void consumeItem(Item item) {
 		if (item instanceof RepairItem) {
 			this.shield = fullShield;
@@ -172,6 +166,11 @@ public class Player extends Unit {
 		item.getOwnerWorld().registerCleanup(item);
 	}
 
+	/**
+	 * Implements cooldown for missiles.
+	 * 
+	 * @param delta
+	 */
 	private void cooldown(int delta) {
 		// saturated subtraction to 0
 		cooldown -= delta;
@@ -179,6 +178,9 @@ public class Player extends Unit {
 			cooldown = 0;
 	}
 
+	/**
+	 * Creates a missile if possible.
+	 */
 	private void fireMissile() {
 		if (cooldown > 0)
 			return;
@@ -193,15 +195,14 @@ public class Player extends Unit {
 	}
 
 	public void destroy() {
-		// check if there are enough lives and respawn if possible at checkpoint
+		// add live checking, score deductions etc here on player death
 	}
 
 	@Override
 	public void update(int delta) {
 		// Required by interface, but can't override without breaking all other
 		// objects
-		// Should be fine in this one case (only player has different type
-		// signature)
+		// (player needs more info to update
 
 	}
 
